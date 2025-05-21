@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Store</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Font Awesome cho các biểu tượng -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <h1 class="logo">Game Store</h1>
+            <div class="header-buttons">
+                <button id="toggle-filters-btn" class="btn btn-secondary mobile-only">
+                    <i class="fas fa-filter"></i> Bộ lọc
+                </button>
+                <button id="admin-login-btn" class="btn btn-primary">
+                    <i class="fas fa-user-shield"></i> Admin
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container">
+        <!-- Bộ lọc -->
+        <div id="filters-section" class="filters-section">
+            <div class="filters-grid">
+                <div class="filter-group">
+                    <label>Tìm kiếm</label>
+                    <div class="search-container">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" id="search-input" placeholder="Tên game...">
+                    </div>
+                </div>
+                
+                <div class="filter-group">
+                    <label>Thể loại</label>
+                    <select id="genre-select" multiple>
+                        <option value="RPG">RPG</option>
+                        <option value="Open World">Open World</option>
+                        <option value="Sports">Sports</option>
+                        <option value="Simulation">Simulation</option>
+                        <option value="Action">Action</option>
+                        <option value="Sandbox">Sandbox</option>
+                        <option value="Adventure">Adventure</option>
+                        <option value="FPS">FPS</option>
+                        <option value="Strategy">Strategy</option>
+                        <option value="Racing">Racing</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label>Khoảng giá (VND)</label>
+                    <div class="range-inputs">
+                        <input type="number" id="min-price" min="0" placeholder="Từ">
+                        <span>-</span>
+                        <input type="number" id="max-price" placeholder="Đến">
+                    </div>
+                </div>
+                
+                <div class="filter-group">
+                    <label>Mức giảm giá (%)</label>
+                    <div class="range-inputs">
+                        <input type="number" id="min-discount" min="0" max="100" placeholder="Từ">
+                        <span>-</span>
+                        <input type="number" id="max-discount" min="0" max="100" placeholder="Đến">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="sort-options">
+                <label>Sắp xếp theo:</label>
+                <select id="sort-by">
+                    <option value="name">Tên</option>
+                    <option value="price">Giá</option>
+                    <option value="discount">Giảm giá</option>
+                    <option value="date">Ngày thêm</option>
+                </select>
+                <button id="sort-direction-btn" class="btn btn-outline">↑</button>
+            </div>
+        </div>
+
+        <!-- Admin: Nhập hàng loạt -->
+        <div id="batch-input-section" class="batch-input-section" style="display: none;">
+            <h3>Thêm hàng loạt (Tên|Giá|Thể loại|Ảnh)</h3>
+            <textarea id="batch-input" placeholder="Ví dụ: Tên Game|150000|RPG,Action|https://example.com/image.jpg"></textarea>
+            <div class="batch-help-text">
+                Mỗi game trên một dòng với định dạng: Tên|Giá|Thể loại1,Thể loại2|URL ảnh
+            </div>
+            <button id="batch-add-btn" class="btn btn-success">Thêm hàng loạt</button>
+        </div>
+
+        <!-- Danh sách game -->
+        <div class="games-section">
+            <h2 id="games-count">Danh sách game (0)</h2>
+            <div id="games-container" class="games-grid">
+                <!-- Game cards will be dynamically inserted here -->
+            </div>
+            <div id="no-games-message" class="no-games-message" style="display: none;">
+                Không tìm thấy game nào phù hợp với bộ lọc
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2025 Game Store - Phát triển bởi Claude 3.7 Sonnet</p>
+    </footer>
+
+    <!-- Modals -->
+    <div id="admin-login-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <h2>Đăng nhập Admin</h2>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Tên đăng nhập</label>
+                    <input type="text" id="admin-username" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label>Mật khẩu</label>
+                    <input type="password" id="admin-password" class="form-input">
+                </div>
+                <div class="modal-buttons">
+                    <button id="admin-cancel-btn" class="btn btn-outline">Hủy</button>
+                    <button id="admin-login-submit-btn" class="btn btn-primary">Đăng nhập</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="game-edit-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <h2 id="game-edit-title">Thêm Game Mới</h2>
+            <button id="game-edit-close-btn" class="modal-close-btn">×</button>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Tên game</label>
+                    <input type="text" id="game-name-input" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label>Giá (VND)</label>
+                    <input type="number" id="game-price-input" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label>Giảm giá (%)</label>
+                    <input type="number" id="game-discount-input" class="form-input" min="0" max="100">
+                </div>
+                <div class="form-group">
+                    <label>Thể loại</label>
+                    <div id="game-genres-container" class="genres-grid">
+                        <!-- Genre checkboxes will be inserted here -->
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>URL hình ảnh</label>
+                    <input type="text" id="game-image-input" class="form-input">
+                </div>
+                <div class="modal-buttons">
+                    <button id="game-edit-cancel-btn" class="btn btn-outline">Hủy</button>
+                    <button id="game-edit-save-btn" class="btn btn-primary">Lưu</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
